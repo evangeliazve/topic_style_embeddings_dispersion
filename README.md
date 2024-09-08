@@ -8,3 +8,6 @@ At the beginning of each script (in the CODE folder), you always need to choose 
 
 Any additional results are available upon request.
 
+
+- DESCRIBE BRIEFLY EACH FOLDER CONTENT
+
