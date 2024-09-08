@@ -121,7 +121,7 @@ def style_embedding_evaluation(embeddings, grouped_features, kernel='rbf', test_
 
 # Iterate over model configurations and load embeddings for each author
 all_model_results_all = []
-all_model_median_results_all = []
+#all_model_median_results_all = []
 
 for config in model_configs:
     model_name = config['model_name']
@@ -134,7 +134,7 @@ for config in model_configs:
             embeddings_all[author] = embeddings
     
     aggregated_mse_results_all = {}
-    aggregated_mse_median_results_all = {}
+    #aggregated_mse_median_results_all = {}
 
     predefined_seeds = [
         42, 7, 19, 23, 1, 100, 56, 77, 89, 33,
@@ -160,12 +160,12 @@ for config in model_configs:
                     aggregated_mse_results_all[key] = {'Queneau_ref': [], 'Queneau_gen': [], 'Feneon_ref': [], 'Feneon_gen': []}
                 aggregated_mse_results_all[key][author].append(row['mse_test'])
 
-                if key not in aggregated_mse_median_results_all:
-                    aggregated_mse_median_results_all[key] = {'Queneau_ref': [], 'Queneau_gen': [], 'Feneon_ref': [], 'Feneon_gen': []}
-                aggregated_mse_median_results_all[key][author].append(row['mse_test'])
+                #if key not in aggregated_mse_median_results_all:
+                   #aggregated_mse_median_results_all[key] = {'Queneau_ref': [], 'Queneau_gen': [], 'Feneon_ref': [], 'Feneon_gen': []}
+                #aggregated_mse_median_results_all[key][author].append(row['mse_test'])
 
     model_mse_results_all = []
-    model_median_results_all = []
+    #model_median_results_all = []
     
     for family, mse_data in aggregated_mse_results_all.items():
         mean_mse_feneon_ref = np.mean(mse_data['Feneon_ref']) if mse_data['Feneon_ref'] else np.nan
@@ -181,33 +181,32 @@ for config in model_configs:
             'Feneon_ref MSE Mean': mean_mse_feneon_ref,
             'Feneon_gen MSE Mean': mean_mse_feneon_gen,
         })
+        #median_mse_feneon_ref = np.median(mse_data['Feneon_ref']) if mse_data['Feneon_ref'] else np.nan
+        #median_mse_feneon_gen = np.median(mse_data['Feneon_gen']) if mse_data['Feneon_gen'] else np.nan
+        #median_mse_queneau_ref = np.median(mse_data['Queneau_ref']) if mse_data['Queneau_ref'] else np.nan
+        #median_mse_queneau_gen = np.median(mse_data['Queneau_gen']) if mse_data['Queneau_gen'] else np.nan
 
-        median_mse_feneon_ref = np.median(mse_data['Feneon_ref']) if mse_data['Feneon_ref'] else np.nan
-        median_mse_feneon_gen = np.median(mse_data['Feneon_gen']) if mse_data['Feneon_gen'] else np.nan
-        median_mse_queneau_ref = np.median(mse_data['Queneau_ref']) if mse_data['Queneau_ref'] else np.nan
-        median_mse_queneau_gen = np.median(mse_data['Queneau_gen']) if mse_data['Queneau_gen'] else np.nan
-
-        model_median_results_all.append({
-            'Model': model_name,
-            'Family': family,
-            'Queneau_ref MSE Median': median_mse_queneau_ref,
-            'Queneau_gen MSE Median': median_mse_queneau_gen,
-            'Feneon_ref MSE Median': median_mse_feneon_ref,
-            'Feneon_gen MSE Median': median_mse_feneon_gen,
-        })
+        #model_median_results_all.append({
+        #    'Model': model_name,
+        #    'Family': family,
+        #    'Queneau_ref MSE Median': median_mse_queneau_ref,
+        #    'Queneau_gen MSE Median': median_mse_queneau_gen,
+        #    'Feneon_ref MSE Median': median_mse_feneon_ref,
+        #    'Feneon_gen MSE Median': median_mse_feneon_gen,
+        #})
 
     all_model_results_all.extend(model_mse_results_all)
-    all_model_median_results_all.extend(model_median_results_all)
+    #all_model_median_results_all.extend(model_median_results_all)
 
 # Convert to DataFrame
 all_model_df_all = pd.DataFrame(all_model_results_all)
-all_model_median_df_all = pd.DataFrame(all_model_median_results_all)
+#all_model_median_df_all = pd.DataFrame(all_model_median_results_all)
 
 # Save MSE results (mean and median)
 output_file_path_mean = os.path.join(results_dir, f"model_feature_mse_{language.lower()}.xlsx")
-output_file_path_median = os.path.join(results_dir, f"model_feature_median_mse_{language.lower()}.xlsx")
+#output_file_path_median = os.path.join(results_dir, f"model_feature_median_mse_{language.lower()}.xlsx")
 all_model_df_all.to_excel(output_file_path_mean, index=False)
-all_model_median_df_all.to_excel(output_file_path_median, index=False)
+#all_model_median_df_all.to_excel(output_file_path_median, index=False)
 
 # Group by 'Family' and calculate the mean and median MSE for each class
 mean_mse_by_family = all_model_df_all.groupby('Family').agg({
@@ -217,12 +216,12 @@ mean_mse_by_family = all_model_df_all.groupby('Family').agg({
     'Feneon_gen MSE Mean': 'mean',
 }).reset_index()
 
-median_mse_by_family = all_model_median_df_all.groupby('Family').agg({
-    'Queneau_ref MSE Median': 'median',
-    'Queneau_gen MSE Median': 'median',
-    'Feneon_ref MSE Median': 'median',
-    'Feneon_gen MSE Median': 'median',
-}).reset_index()
+#median_mse_by_family = all_model_median_df_all.groupby('Family').agg({
+#    'Queneau_ref MSE Median': 'median',
+#    'Queneau_gen MSE Median': 'median',
+#    'Feneon_ref MSE Median': 'median',
+#    'Feneon_gen MSE Median': 'median',
+#}).reset_index()
 
 # Calculate deltas for mean and median
 mean_mse_by_family['Delta MSE Mean (Queneau_ref/Queneau_gen)'] = (
@@ -232,18 +231,18 @@ mean_mse_by_family['Delta MSE Mean (Feneon_ref/Queneau_gen)'] = (
     mean_mse_by_family['Feneon_ref MSE Mean'] - mean_mse_by_family['Queneau_gen MSE Mean']
 )
 
-median_mse_by_family['Delta MSE Median (Queneau_ref/Queneau_gen)'] = (
-    median_mse_by_family['Queneau_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
-)
-median_mse_by_family['Delta MSE Median (Feneon_ref/Queneau_gen)'] = (
-    median_mse_by_family['Feneon_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
-)
+#median_mse_by_family['Delta MSE Median (Queneau_ref/Queneau_gen)'] = (
+#    median_mse_by_family['Queneau_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
+#)
+#median_mse_by_family['Delta MSE Median (Feneon_ref/Queneau_gen)'] = (
+#    median_mse_by_family['Feneon_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
+#)
 
 # Save the grouped results
 output_mean_file_path = os.path.join(results_dir, f"mean_mse_by_feature_{language.lower()}.xlsx")
-output_median_file_path = os.path.join(results_dir, f"median_mse_by_feature_{language.lower()}.xlsx")
+#output_median_file_path = os.path.join(results_dir, f"median_mse_by_feature_{language.lower()}.xlsx")
 mean_mse_by_family.to_excel(output_mean_file_path, index=False)
-median_mse_by_family.to_excel(output_median_file_path, index=False)
+#median_mse_by_family.to_excel(output_median_file_path, index=False)
 
 # Statistical tests
 def perform_stat_tests(df, mse_type='Mean'):
@@ -304,18 +303,18 @@ def perform_mann_whitney_tests(df, mse_type='Mean'):
 check_results_mean_df = perform_stat_tests(all_model_df_all, mse_type='Mean')
 mannwhitney_mean_df = perform_mann_whitney_tests(all_model_df_all, mse_type='Mean')
 
-check_results_median_df = perform_stat_tests(all_model_median_df_all, mse_type='Median')
-mannwhitney_median_df = perform_mann_whitney_tests(all_model_median_df_all, mse_type='Median')
+#check_results_median_df = perform_stat_tests(all_model_median_df_all, mse_type='Median')
+#mannwhitney_median_df = perform_mann_whitney_tests(all_model_median_df_all, mse_type='Median')
 
 output_check_file_path_mean = os.path.join(results_dir, f"mse_normality_variance_results_mean_{language.lower()}.xlsx")
-output_check_file_path_median = os.path.join(results_dir, f"mse_normality_variance_results_median_{language.lower()}.xlsx")
+#output_check_file_path_median = os.path.join(results_dir, f"mse_normality_variance_results_median_{language.lower()}.xlsx")
 check_results_mean_df.to_excel(output_check_file_path_mean, index=False)
-check_results_median_df.to_excel(output_check_file_path_median, index=False)
+#check_results_median_df.to_excel(output_check_file_path_median, index=False)
 
 final_results_mean = pd.merge(mean_mse_by_family, mannwhitney_mean_df, on='Family')
-final_results_median = pd.merge(median_mse_by_family, mannwhitney_median_df, on='Family')
+#final_results_median = pd.merge(median_mse_by_family, mannwhitney_median_df, on='Family')
 
 output_combined_file_path_mean = os.path.join(results_dir, f"mean_mse_mannwhitney_results_{language.lower()}.xlsx")
-output_combined_file_path_median = os.path.join(results_dir, f"median_mse_mannwhitney_results_{language.lower()}.xlsx")
+#output_combined_file_path_median = os.path.join(results_dir, f"median_mse_mannwhitney_results_{language.lower()}.xlsx")
 final_results_mean.to_excel(output_combined_file_path_mean, index=False)
-final_results_median.to_excel(output_combined_file_path_median, index=False)
+#final_results_median.to_excel(output_combined_file_path_median, index=False)
