@@ -21,8 +21,8 @@ base_paths = {
 
 # Output paths for results and plots in French and English
 results_paths = {
-    "FR": f'{your_path}/Style-Embeddings-paper-zip/RESULTS/Section 4.1/FRENCH',
-    "EN": f'{your_path}/Style-Embeddings-paper-zip/RESULTS/Section 4.1/ENGLISH'
+    "FR": f'{your_path}/Style-Embeddings-paper-zip/RESULTS/Section 4.1/',
+    "EN": f'{your_path}/Style-Embeddings-paper-zip/RESULTS/Section 4.1/'
 }
 
 # Prompt user to select language
