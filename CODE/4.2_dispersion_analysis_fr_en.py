@@ -198,6 +198,47 @@ final_results_df = pd.concat(all_results, ignore_index=True)
 final_results_file = os.path.join(results_dir, f'dispersion_results_{language}.xlsx')
 final_results_df.to_excel(final_results_file, index=False)
 
+## Mean & Median evaluation 
+# Calculate mean of mean distances for each condition/dimension
+mean_distances_summary = final_results_df.groupby(['UMAP_Dimension', 'Condition']) \
+    .agg({
+        'Mean1': 'mean',
+        'Mean2': 'mean',
+        'Condition_Satisfied': 'mean',
+        'Condition_Significant': 'mean',
+        'P_Value_T': 'mean'  # Mean of p-values
+    }).reset_index()
+
+# Calculate median of mean distances for each condition/dimension
+median_mean_distances = final_results_df.groupby(['UMAP_Dimension', 'Condition']) \
+    .agg({
+        'Mean1': 'median',
+        'Mean2': 'median',
+        'Condition_Satisfied': 'median',
+        'Condition_Significant': 'median',
+        'P_Value_T': 'median'  # Median of p-values
+    }).reset_index()
+
+# Determine if medians and averages are satisfied and significant
+def determine_satisfaction_and_significance(df):
+    df['Condition_Satisfied'] = df['Mean1'] > df['Mean2']
+    df['Condition_Significant'] = df['P_Value_T'] < 0.05
+    return df
+
+
+mean_distances_summary = determine_satisfaction_and_significance(mean_distances_summary)
+median_mean_distances = determine_satisfaction_and_significance(median_mean_distances)
+
+# Save the results 
+mean_distances_summary_file = os.path.join(results_dir, f'mean_distances_summary_{language}.xlsx')
+median_mean_distances_file = os.path.join(results_dir, f'median_mean_distances_{language}.xlsx')
+
+mean_distances_summary.to_excel(mean_distances_summary_file, index=False)
+median_mean_distances.to_excel(median_mean_distances_file, index=False)
+
+print(f"Mean distances summary saved to {mean_distances_summary_file}")
+print(f"Median mean distances saved to {median_mean_distances_file}")
+
 #### Optimal Dimensionality 
 
 # Group the final results by UMAP Dimension and calculate counts
