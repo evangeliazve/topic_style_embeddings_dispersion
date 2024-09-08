@@ -7,15 +7,14 @@ import pickle
 import tqdm
 import umap
 
-import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
-
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error
+from scipy.stats import mannwhitneyu, shapiro, levene
 
 # Paths for datasets and results
 your_path = "/Users/evangeliazve/Documents"
@@ -39,7 +38,7 @@ os.makedirs(results_dir, exist_ok=True)
 
 # Load stylometric datasets with features mapped to 8 categories
 input_directory = f'{your_path}/Style-Embeddings-paper-zip/DATA/'
-stylo_df_grouped = pd.read_excel(input_directory + "stylo_df_grouped_fr.xlsx")
+stylo_df_grouped = pd.read_excel(input_directory + f"stylo_df_grouped_{language.lower()}.xlsx")
 
 # Dataset paths for each author
 dataset_folders = {
@@ -65,22 +64,14 @@ model_configs = [
     {"model_name": "intfloat/multilingual-e5-large"},
 ]
 
-# Assuming authors here is our 4 classes (queneau_ref, queneau_gen, feneon_ref, feneon_gen)
 # Load embeddings using the author name from `stylo_df_grouped`
 def load_embeddings_with_pickle(model_name, author_name, base_path):
-    # Correct the model name to correct file paths
     safe_model_name = model_name.replace('/', '_').replace('\\', '_')
-    
-    # Get the dataset folder for the author name (assuming the author name is the key in dataset_folders)
     dataset_folder = dataset_folders.get(author_name)
     if dataset_folder is None:
         print(f"No dataset folder found for author {author_name}")
         return None
-
-    # Construct the file path for the embeddings
     file_path = os.path.join(base_path, dataset_folder, f"{safe_model_name}_embeddings.pkl")
-    
-    # Load the embeddings if the file exists
     if os.path.exists(file_path):
         with open(file_path, 'rb') as f:
             embeddings = pickle.load(f)
@@ -105,27 +96,21 @@ def svr_regressor_train_test(x, y, test_size=0.3, kernel='rbf'):
 def style_embedding_evaluation(embeddings, grouped_features, kernel='rbf', test_size=0.3):
     author_results = {}
     
-    # Iterate over each author in the grouped features
     for author in grouped_features['author'].unique():
-        # Select the features for the current author
         author_features = grouped_features[grouped_features['author'] == author].drop(['id', 'author'], axis=1)
-        
-        # Get the corresponding embeddings
         author_embeddings = embeddings.get(author)
         if author_embeddings is None:
             print(f"Skipping {author} due to missing embeddings.")
             continue
         
         res_dict = {}
-        # Iterate over feature families (grouped data)
         features_columns = ["Structural", "Indexes", "Letters", "Punctuation", 
                    "TAG", "NER", "Function words", "Numbers"]
         for feature_family in features_columns:
             y = np.array(author_features[feature_family])
-            y = (y - np.mean(y)) / np.std(y)  # Standardize the target variable
+            y = (y - np.mean(y)) / np.std(y)
             if np.isnan(y).any():
                 continue
-            
             mse_test, mse_train = svr_regressor_train_test(author_embeddings, y, test_size=test_size, kernel=kernel)
             res_dict[feature_family] = {"mse_test": mse_test, "mse_train": mse_train}
         
@@ -136,25 +121,25 @@ def style_embedding_evaluation(embeddings, grouped_features, kernel='rbf', test_
 
 # Iterate over model configurations and load embeddings for each author
 all_model_results_all = []
+all_model_median_results_all = []
+
 for config in model_configs:
     model_name = config['model_name']
     
     embeddings_all = {}
     
-    # Load embeddings for each author using their names
     for author in stylo_df_grouped['author'].unique():
         embeddings = load_embeddings_with_pickle(model_name, author, base_path)
         if embeddings is not None:
             embeddings_all[author] = embeddings
     
-    # Store MSE results per family per seed
     aggregated_mse_results_all = {}
+    aggregated_mse_median_results_all = {}
 
-    # Apply UMAP and calculate MSE for each seed
     predefined_seeds = [
-    42, 7, 19, 23, 1, 100, 56, 77, 89, 33,
-    8, 13, 5, 21, 34, 99, 67, 18, 50, 81,
-    45, 22, 74, 37, 58, 90, 16, 11, 29, 85
+        42, 7, 19, 23, 1, 100, 56, 77, 89, 33,
+        8, 13, 5, 21, 34, 99, 67, 18, 50, 81,
+        45, 22, 74, 37, 58, 90, 16, 11, 29, 85
     ]
 
     for seed in predefined_seeds:
@@ -168,7 +153,6 @@ for config in model_configs:
         
         res_df_all = style_embedding_evaluation(umap_results_all, stylo_df_grouped, kernel='rbf')
 
-        # Aggregate results
         for author, mse_df in res_df_all.items():
             for family, row in mse_df.iterrows():
                 key = family
@@ -176,8 +160,13 @@ for config in model_configs:
                     aggregated_mse_results_all[key] = {'Queneau_ref': [], 'Queneau_gen': [], 'Feneon_ref': [], 'Feneon_gen': []}
                 aggregated_mse_results_all[key][author].append(row['mse_test'])
 
-    # Calculate mean MSE across all seeds for this model
+                if key not in aggregated_mse_median_results_all:
+                    aggregated_mse_median_results_all[key] = {'Queneau_ref': [], 'Queneau_gen': [], 'Feneon_ref': [], 'Feneon_gen': []}
+                aggregated_mse_median_results_all[key][author].append(row['mse_test'])
+
     model_mse_results_all = []
+    model_median_results_all = []
+    
     for family, mse_data in aggregated_mse_results_all.items():
         mean_mse_feneon_ref = np.mean(mse_data['Feneon_ref']) if mse_data['Feneon_ref'] else np.nan
         mean_mse_feneon_gen = np.mean(mse_data['Feneon_gen']) if mse_data['Feneon_gen'] else np.nan
@@ -193,16 +182,34 @@ for config in model_configs:
             'Feneon_gen MSE Mean': mean_mse_feneon_gen,
         })
 
+        median_mse_feneon_ref = np.median(mse_data['Feneon_ref']) if mse_data['Feneon_ref'] else np.nan
+        median_mse_feneon_gen = np.median(mse_data['Feneon_gen']) if mse_data['Feneon_gen'] else np.nan
+        median_mse_queneau_ref = np.median(mse_data['Queneau_ref']) if mse_data['Queneau_ref'] else np.nan
+        median_mse_queneau_gen = np.median(mse_data['Queneau_gen']) if mse_data['Queneau_gen'] else np.nan
+
+        model_median_results_all.append({
+            'Model': model_name,
+            'Family': family,
+            'Queneau_ref MSE Median': median_mse_queneau_ref,
+            'Queneau_gen MSE Median': median_mse_queneau_gen,
+            'Feneon_ref MSE Median': median_mse_feneon_ref,
+            'Feneon_gen MSE Median': median_mse_feneon_gen,
+        })
+
     all_model_results_all.extend(model_mse_results_all)
+    all_model_median_results_all.extend(model_median_results_all)
 
-# Convert to DataFrame for easier manipulation
+# Convert to DataFrame
 all_model_df_all = pd.DataFrame(all_model_results_all)
+all_model_median_df_all = pd.DataFrame(all_model_median_results_all)
 
-# Save the MSE scores by author and model
-output_file_path = os.path.join(results_dir, f"model_feature_mse_{language.lower()}.xlsx")
-all_model_df_all.to_excel(output_file_path, index=False)
+# Save MSE results (mean and median)
+output_file_path_mean = os.path.join(results_dir, f"model_feature_mse_{language.lower()}.xlsx")
+output_file_path_median = os.path.join(results_dir, f"model_feature_median_mse_{language.lower()}.xlsx")
+all_model_df_all.to_excel(output_file_path_mean, index=False)
+all_model_median_df_all.to_excel(output_file_path_median, index=False)
 
-# Group by 'Family' and calculate the mean MSE for each class across all models
+# Group by 'Family' and calculate the mean and median MSE for each class
 mean_mse_by_family = all_model_df_all.groupby('Family').agg({
     'Queneau_ref MSE Mean': 'mean',
     'Queneau_gen MSE Mean': 'mean',
@@ -210,7 +217,14 @@ mean_mse_by_family = all_model_df_all.groupby('Family').agg({
     'Feneon_gen MSE Mean': 'mean',
 }).reset_index()
 
-# Calculate delta for the means
+median_mse_by_family = all_model_median_df_all.groupby('Family').agg({
+    'Queneau_ref MSE Median': 'median',
+    'Queneau_gen MSE Median': 'median',
+    'Feneon_ref MSE Median': 'median',
+    'Feneon_gen MSE Median': 'median',
+}).reset_index()
+
+# Calculate deltas for mean and median
 mean_mse_by_family['Delta MSE Mean (Queneau_ref/Queneau_gen)'] = (
     mean_mse_by_family['Queneau_ref MSE Mean'] - mean_mse_by_family['Queneau_gen MSE Mean']
 )
@@ -218,95 +232,90 @@ mean_mse_by_family['Delta MSE Mean (Feneon_ref/Queneau_gen)'] = (
     mean_mse_by_family['Feneon_ref MSE Mean'] - mean_mse_by_family['Queneau_gen MSE Mean']
 )
 
-# Save the mean MSE results
+median_mse_by_family['Delta MSE Median (Queneau_ref/Queneau_gen)'] = (
+    median_mse_by_family['Queneau_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
+)
+median_mse_by_family['Delta MSE Median (Feneon_ref/Queneau_gen)'] = (
+    median_mse_by_family['Feneon_ref MSE Median'] - median_mse_by_family['Queneau_gen MSE Median']
+)
+
+# Save the grouped results
 output_mean_file_path = os.path.join(results_dir, f"mean_mse_by_feature_{language.lower()}.xlsx")
+output_median_file_path = os.path.join(results_dir, f"median_mse_by_feature_{language.lower()}.xlsx")
 mean_mse_by_family.to_excel(output_mean_file_path, index=False)
+median_mse_by_family.to_excel(output_median_file_path, index=False)
 
-###### Find MSE statistical difference between classes
-## As our population here is very small (12 obervations), we are looking to see if normality and equal variances are satified. 
-
-def perform_stat_tests(df):
+# Statistical tests
+def perform_stat_tests(df, mse_type='Mean'):
     results = []
-
     for family, group in df.groupby('Family'):
-        # Shapiro-Wilk test for normality
         try:
-            if len(group['Queneau_ref MSE Mean']) >= 3:
-                stat_queneau_ref, p_queneau_ref = stats.shapiro(group['Queneau_ref MSE Mean'])
+            if len(group[f'Queneau_ref MSE {mse_type}']) >= 3:
+                _, p_queneau_ref = shapiro(group[f'Queneau_ref MSE {mse_type}'])
             else:
                 p_queneau_ref = 'Not enough data'
 
-            if len(group['Feneon_ref MSE Mean']) >= 3:
-                stat_feneon_ref, p_feneon_ref = stats.shapiro(group['Feneon_ref MSE Mean'])
+            if len(group[f'Feneon_ref MSE {mse_type}']) >= 3:
+                _, p_feneon_ref = shapiro(group[f'Feneon_ref MSE {mse_type}'])
             else:
                 p_feneon_ref = 'Not enough data'
 
-            if len(group['Queneau_gen MSE Mean']) >= 3:
-                stat_queneau_gen, p_queneau_gen = stats.shapiro(group['Queneau_gen MSE Mean'])
+            if len(group[f'Queneau_gen MSE {mse_type}']) >= 3:
+                _, p_queneau_gen = shapiro(group[f'Queneau_gen MSE {mse_type}'])
             else:
                 p_queneau_gen = 'Not enough data'
 
-            # Levene's test for equal variances between Queneau_ref and Queneau_gen
-            stat_levene, p_levene = stats.levene(group['Queneau_ref MSE Mean'], group['Queneau_gen MSE Mean'])
+            _, p_levene = levene(group[f'Queneau_ref MSE {mse_type}'], group[f'Queneau_gen MSE {mse_type}'])
 
-            # Append results
             results.append({
                 'Family': family,
-                'Shapiro-Wilk p-value (Queneau_ref)': p_queneau_ref,
-                'Shapiro-Wilk p-value (Feneon_ref)': p_feneon_ref,
-                'Shapiro-Wilk p-value (Queneau_gen)': p_queneau_gen,
-                'Levene’s p-value (Queneau_ref vs Queneau_gen)': p_levene
+                f'Shapiro-Wilk p-value (Queneau_ref) {mse_type}': p_queneau_ref,
+                f'Shapiro-Wilk p-value (Feneon_ref) {mse_type}': p_feneon_ref,
+                f'Shapiro-Wilk p-value (Queneau_gen) {mse_type}': p_queneau_gen,
+                f'Levene’s p-value (Queneau_ref vs Queneau_gen) {mse_type}': p_levene
             })
-
         except ValueError as e:
             print(f"Error for {family}: {e}")
     
     return pd.DataFrame(results)
 
-# Perform the tests
-check_results_df = perform_stat_tests(all_model_df_all)
-# Save the final results to an Excel file
-output_check_file_path = os.path.join(results_dir, f"mse_normality_variance_results_{language.lower()}.xlsx")
-check_results_df.to_excel(output_check_file_path, index=False)
+def perform_mann_whitney_tests(df, mse_type='Mean'):
+    mannwhitney_results = []
+    for family, group in df.groupby('Family'):
+        stat_queneau, p_value_queneau = mannwhitneyu(
+            group[f'Queneau_ref MSE {mse_type}'], 
+            group[f'Queneau_gen MSE {mse_type}'], 
+            alternative='two-sided'
+        )
+        stat_feneon_queneau, p_value_feneon_queneau = mannwhitneyu(
+            group[f'Feneon_ref MSE {mse_type}'], 
+            group[f'Queneau_gen MSE {mse_type}'], 
+            alternative='two-sided'
+        )
+        mannwhitney_results.append({
+            'Family': family,
+            f'Queneau_ref vs Queneau_gen U_statistic {mse_type}': stat_queneau,
+            f'Queneau_ref vs Queneau_gen p_value {mse_type}': round(p_value_queneau, 6),
+            f'Feneon_ref vs Queneau_gen U_statistic {mse_type}': stat_feneon_queneau,
+            f'Feneon_ref vs Queneau_gen p_value {mse_type}': round(p_value_feneon_queneau, 6)
+        })
+    return pd.DataFrame(mannwhitney_results)
 
-### Mann-Witney U test for non-parametric distributions
+check_results_mean_df = perform_stat_tests(all_model_df_all, mse_type='Mean')
+mannwhitney_mean_df = perform_mann_whitney_tests(all_model_df_all, mse_type='Mean')
 
-from scipy.stats import mannwhitneyu
+check_results_median_df = perform_stat_tests(all_model_median_df_all, mse_type='Median')
+mannwhitney_median_df = perform_mann_whitney_tests(all_model_median_df_all, mse_type='Median')
 
-mannwhitney_results = []
+output_check_file_path_mean = os.path.join(results_dir, f"mse_normality_variance_results_mean_{language.lower()}.xlsx")
+output_check_file_path_median = os.path.join(results_dir, f"mse_normality_variance_results_median_{language.lower()}.xlsx")
+check_results_mean_df.to_excel(output_check_file_path_mean, index=False)
+check_results_median_df.to_excel(output_check_file_path_median, index=False)
 
-# Step 3: Perform Mann-Whitney U tests for each family and comparison
-for family, group in all_model_df_all.groupby('Family'):
-    
-    # Mann-Whitney U Test: Queneau_ref vs Queneau_gen
-    stat_queneau, p_value_queneau = mannwhitneyu(
-        group['Queneau_ref MSE Mean'], 
-        group['Queneau_gen MSE Mean'], 
-        alternative='two-sided'
-    )
-    
-    # Mann-Whitney U Test: Feneon_ref vs Queneau_gen
-    stat_feneon_queneau, p_value_feneon_queneau = mannwhitneyu(
-        group['Feneon_ref MSE Mean'], 
-        group['Queneau_gen MSE Mean'], 
-        alternative='two-sided'
-    )
-    
-    # Store the results for both tests
-    mannwhitney_results.append({
-        'Family': family,
-        'Queneau_ref vs Queneau_gen U_statistic': stat_queneau,
-        'Queneau_ref vs Queneau_gen p_value': round(p_value_queneau, 6),
-        'Feneon_ref vs Queneau_gen U_statistic': stat_feneon_queneau,
-        'Feneon_ref vs Queneau_gen p_value': round(p_value_feneon_queneau, 6)
-    })
+final_results_mean = pd.merge(mean_mse_by_family, mannwhitney_mean_df, on='Family')
+final_results_median = pd.merge(median_mse_by_family, mannwhitney_median_df, on='Family')
 
-# Convert the Mann-Whitney U test results to a DataFrame
-mannwhitney_df = pd.DataFrame(mannwhitney_results)
-
-# Merge mean MSE values with Mann-Whitney test results
-final_results = pd.merge(mean_mse_by_family, mannwhitney_df, on='Family')
-
-# Save the final results to an Excel file
-output_combined_file_path = os.path.join(results_dir, f"mean_mse_mannwhitney_results_{language.lower()}.xlsx")
-final_results.to_excel(output_combined_file_path, index=False)
+output_combined_file_path_mean = os.path.join(results_dir, f"mean_mse_mannwhitney_results_{language.lower()}.xlsx")
+output_combined_file_path_median = os.path.join(results_dir, f"median_mse_mannwhitney_results_{language.lower()}.xlsx")
+final_results_mean.to_excel(output_combined_file_path_mean, index=False)
+final_results_median.to_excel(output_combined_file_path_median, index=False)
