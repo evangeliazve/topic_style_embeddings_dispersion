@@ -35,7 +35,7 @@ dataset_folders = {
     "Queneau_gen": "embeddings_Queneau_gen/",
     "Feneon_gen": "embeddings_Feneon_gen/"
 }
-"""
+
 # Predefined UMAP dimensions and seeds
 umap_dimensions = [2, 3, 5, 10]
 predefined_seeds = [42, 7, 19, 23, 1, 100, 56, 77, 89, 33, 8, 
@@ -185,7 +185,7 @@ for class_name, distances_list in all_model_distances.items():
 mean_distances_df = pd.DataFrame(mean_distances_data)
 mean_distances_file = os.path.join(results_dir, f'distance_pertext_umap_2d_{language}.xlsx')
 mean_distances_df.to_excel(mean_distances_file, index=False)
-"""
+
 # Combine all results into one final file
 all_results = []
 for file in os.listdir(results_dir):
