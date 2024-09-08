@@ -1,3 +1,4 @@
+#pip install pandas numpy seaborn matplotlib scipy
 
 import pandas as pd
 import numpy as np
@@ -6,24 +7,20 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 
-#### INPUT PATHS (FR & EN)
+# User input with desired language
+language = input("Please enter the desired language (e.g., 'en' for English, 'fr' for French): ")
+your_path = "/Users/evangeliazve/Documents" # to change with your path
 
 # Load the Stylometry report for 8 categories
-# FR PATH
-stylo_df_fr_file_path = '/your_path/Style-Embeddings-paper-zip/DATA/stylo_df_grouped_fr.xlsx'
-# EN PATH
-stylo_df_en_file_path = '/your_path/Style-Embeddings-paper-zip/DATA/stylo_df_grouped_en.xlsx'
-
-stylo_df_grouped = pd.read_excel("CHOOSE LANGUAGE PATH FROM ABOVE")
+stylo_df_file_path = f'{your_path}/Style-Embeddings-paper-zip/DATA/stylo_df_grouped_{language.lower()}.xlsx'
+stylo_df_grouped = pd.read_excel(stylo_df_file_path)
 
 # Load the mean distances from the previously saved file from section 4.2
-# FR PATH
-mean_distances_fr_file_path = '/your_path/Style-Embeddings-paper-zip/RESULTS/Section 4.2/mean_distances_across_models_umap_2d_FR.xlsx'
-# EN PATH
-mean_distances_en_file_path = '/your_path/Style-Embeddings-paper-zip/RESULTS/Section 4.2/mean_distances_across_models_umap_2d_EN.xlsx'
+mean_distances_file_path = f'{your_path}/Style-Embeddings-paper-zip/RESULTS/Section 4.2/distance_pertext_umap_2d_{language.upper()}.xlsx'
+mean_distances_df = pd.read_excel(mean_distances_file_path)
 
-mean_distances_df = pd.read_excel("CHOOSE LANGUAGE PATH FROM ABOVE")
-
+# Result directory
+result_dir = f'{your_path}/Style-Embeddings-paper-zip/PLOTS/Section 4.3/'
 
 #### DISPERSION ANALYSIS BY CLASS (4 CLASSES)
 
@@ -131,9 +128,14 @@ ax.set_yticklabels(ax.get_yticklabels(), rotation=0, ha="right", fontsize=14)
 cbar = heatmap.collections[0].colorbar
 cbar.ax.tick_params(labelsize=12)  # Increase the colorbar font size here
 
-# Show the plot
+plot1_save_name = f'{result_dir}/corrplot_dispersion_4classes_{language.upper()}.png'
 plt.tight_layout()
+plt.savefig(plot1_save_name)
+
+# Now show the first plot
 plt.show()
+
+
 
 #### DISPERSION DELTA ANALYSIS FOR 2 COMPARISONS
 ## Queneau_ref vs Queneau_gen
@@ -326,9 +328,9 @@ ax.set_xlabel('')
 cbar = heatmap.collections[0].colorbar
 cbar.ax.tick_params(labelsize=14)
 
-# Show the plot
+plot2_save_name = f'{result_dir}/corrplot_dispersion_delta_{language.upper()}.png'
 plt.tight_layout()
+plt.savefig(plot2_save_name)
+
+# Show the second plot
 plt.show()
-
-
-
