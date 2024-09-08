@@ -1,4 +1,3 @@
-# Install necessary packages via pip
 #pip install numpy matplotlib scikit-learn pandas scipy
 
 # Import libraries
@@ -12,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from scipy.stats import ttest_ind
 
 # User input with desired language
-language = input("Please enter the desired language (e.g., 'en' for English, 'fr' for French): ")
+language = input("Please enter the desired language (e.g., 'en' for English, 'fr' for French): ").lower()
 your_path = "/Users/evangeliazve/Documents" # to change with your path
 
 # Set the directory paths manually
