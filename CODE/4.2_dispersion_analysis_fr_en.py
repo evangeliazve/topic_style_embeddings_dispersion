@@ -6,6 +6,7 @@ import os
 import pickle
 from scipy.spatial.distance import cdist
 from scipy.stats import ttest_ind
+from scipy.stats import chi2
 import umap
 
 your_path = "/Users/evangeliazve/Documents"
@@ -198,7 +199,14 @@ final_results_df = pd.concat(all_results, ignore_index=True)
 final_results_file = os.path.join(results_dir, f'dispersion_results_{language}.xlsx')
 final_results_df.to_excel(final_results_file, index=False)
 
-## Mean & Median evaluation 
+## Mean & Median Model evaluation 
+final_results_file = os.path.join(results_dir, f'dispersion_results_{language}.xlsx')
+mean_distances_file = os.path.join(results_dir, f'distance_pertext_umap_2d_{language}.xlsx')
+
+# Load the combined results and mean distances
+final_results_df = pd.read_excel(final_results_file)
+mean_distances_df = pd.read_excel(mean_distances_file)
+
 # Calculate mean of mean distances for each condition/dimension
 mean_distances_summary = final_results_df.groupby(['UMAP_Dimension', 'Condition']) \
     .agg({
@@ -206,7 +214,7 @@ mean_distances_summary = final_results_df.groupby(['UMAP_Dimension', 'Condition'
         'Mean2': 'mean',
         'Condition_Satisfied': 'mean',
         'Condition_Significant': 'mean',
-        'P_Value_T': 'mean'  # Mean of p-values
+        'P_Value_T': lambda x: chi2.sf(-2 * np.sum(np.log(x)), 2 * len(x))
     }).reset_index()
 
 # Calculate median of mean distances for each condition/dimension
@@ -216,20 +224,21 @@ median_mean_distances = final_results_df.groupby(['UMAP_Dimension', 'Condition']
         'Mean2': 'median',
         'Condition_Satisfied': 'median',
         'Condition_Significant': 'median',
-        'P_Value_T': 'median'  # Median of p-values
+        'P_Value_T': lambda x: chi2.sf(-2 * np.sum(np.log(x)), 2 * len(x))
     }).reset_index()
 
 # Determine if medians and averages are satisfied and significant
 def determine_satisfaction_and_significance(df):
     df['Condition_Satisfied'] = df['Mean1'] > df['Mean2']
     df['Condition_Significant'] = df['P_Value_T'] < 0.05
+    
     return df
 
 
 mean_distances_summary = determine_satisfaction_and_significance(mean_distances_summary)
 median_mean_distances = determine_satisfaction_and_significance(median_mean_distances)
 
-# Save the results 
+# Save the results to new files
 mean_distances_summary_file = os.path.join(results_dir, f'mean_distances_summary_{language}.xlsx')
 median_mean_distances_file = os.path.join(results_dir, f'median_mean_distances_{language}.xlsx')
 
