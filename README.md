@@ -1,13 +1,39 @@
-# Embedding Style Beyond Topics
-## Analyzing Dispersion Effects Across Different Language Models
+# Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models (NOT FINISHED YET)
 
-This GitHub repository accompanies our submission to COLING 2025.
+This repository contains the code, data, and results accompanying our submission to COLING 2025.
 
-All code is executable. You will need to download the files and adjust your repository paths accordingly.
-At the beginning of each script (in the CODE folder), you always need to choose either 'FR' or 'EN' for the language.
+## Setup
+- All scripts in the `CODE` folder are executable. You must set the language to either `'FR'` or `'EN'` (or `'fr'`, `'en'`) at the beginning of each script.
+- Ensure that the correct local paths are set before executing the code.
+- The code is fully reproducible and can be adapted to test additional models, provided the input format is correct.
 
-Any additional results are available upon request.
+## Repository Structure
 
+### `DATA`
+Contains all input data used for the analysis:
+- Stylometry reports (based on [EnzoFleur's repository](https://github.com/EnzoFleur/style_embedding_evaluation)).
+- Embeddings from French and English datasets.
 
-- DESCRIBE BRIEFLY EACH FOLDER CONTENT
+### `RESULTS`
+Contains the output data from the analysis:
+- **Clustering Results**: Includes NMI, Purity, and Mean S scores, as detailed in Section 4.1 of the paper.
+- **Dispersion Results**: Contains condition-wise analysis, centroid means, and statistical significance, as discussed in Section 4.2.
+- **Embedding Style Interpretability**: Results for Section 4.3.
+
+### `CODE`
+Contains the main scripts to reproduce the results:
+- **Text Generation**: Code for generating additional classes using GPT-4.
+- **Clustering Analysis**: Code for Section 4.1.
+- **Dispersion Analysis**: Full experimental setup for Section 4.2, covering all dimensionalities and 30 seed iterations.
+- **Ground Truth Analysis**: Code for Section 4.3, including analysis of style and dispersion deltas and MSE per class.
+
+### `PLOT`
+Contains all major plots for each section:
+- **Section 4.1**: 2D PCA clustering projections, along with class frequency bar plots.
+- **Section 4.2**: Contour plots for dispersion results (using sentence-transformers/all-MiniLM-L12-v2) in 2D UMAP, including sensitivity plots across different iterations.
+- **Section 4.3**: Correlation plots comparing dispersion deltas with stylometric ground truth deltas, and analysis of dispersion results across four classes.
+
+## Additional Information
+For any additional results or clarifications, please contact us.
+
 
