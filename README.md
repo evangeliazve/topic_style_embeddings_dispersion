@@ -30,7 +30,7 @@ Contains the main scripts to reproduce the results:
 ### `PLOT`
 Contains all major plots for each section:
 - **Section 4.1**: 2D PCA clustering projections, along with class frequency bar plots.
-- **Section 4.2**: Contour plots for dispersion results (using sentence-transformers/all-MiniLM-L12-v2) in 2D UMAP, including sensitivity plots across different iterations.
+- **Section 4.2**: Contour plots for dispersion results (using sentence-transformers/all-MiniLM-L12-v2) in 2D UMAP, including sensitivity plots across different iterations for decision making.
 - **Section 4.3**: Correlation plots comparing dispersion deltas with stylometric ground truth deltas, and analysis of dispersion results across four classes.
 
 ## Additional Information
