@@ -5,7 +5,7 @@ This repository contains the code, data, and results accompanying our submission
 ## Setup
 - All scripts in the `CODE` folder are executable. You must set the language to either `'FR'` or `'EN'` (or `'fr'`, `'en'`) at the beginning of each script.
 - Ensure that the correct local paths are set before executing the code.
-- The code allows for full reproduction of results and can be adapted to test additional models using the provided input format.
+- The code allows for full reproduction of results and can be adapted to test additional models and/or a different corpus using the provided input format.
   
 ## Repository Structure
 
