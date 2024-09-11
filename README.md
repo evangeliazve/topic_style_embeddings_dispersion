@@ -1,12 +1,12 @@
-# Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models (NOT FINISHED YET)
+# Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models
 
 This repository contains the code, data, and results accompanying our submission to COLING 2025.
 
 ## Setup
 - All scripts in the `CODE` folder are executable. You must set the language to either `'FR'` or `'EN'` (or `'fr'`, `'en'`) at the beginning of each script.
 - Ensure that the correct local paths are set before executing the code.
-- The code is fully reproducible and can be adapted to test additional models, provided the input format is correct.
-
+- The code allows for full reproduction of results and can be adapted to test additional models using the provided input format.
+  
 ## Repository Structure
 
 ### `DATA`
