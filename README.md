@@ -34,6 +34,6 @@ Contains all major plots for each section:
 - **Section 4.3**: Correlation plots comparing dispersion deltas with stylometric ground truth deltas, and analysis of dispersion results across four classes.
 
 ## Additional Information
-For any additional results or clarifications, please contact us.
+For any additional results or clarifications, please contact us : evangelia.zve@lip6.fr
 
 
