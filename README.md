@@ -12,7 +12,7 @@ This repository contains the code, data, plots, and results accompanying our sub
 ### `DATA`
 Contains all input data used for the analysis:
 - Stylometry reports (based on [EnzoFleur's repository](https://github.com/EnzoFleur/style_embedding_evaluation)).
-- Embeddings from French and English datasets.
+- Embeddings from French and English datasets in .pkl files.
 
 ### `RESULTS`
 Contains the output data from the analysis:
