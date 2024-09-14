@@ -1,6 +1,6 @@
 # Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models
 
-This repository contains the code, data, and results accompanying our submission to COLING 2025.
+This repository contains the code, data, plots, and results accompanying our submission to COLING 2025.
 
 ## Setup
 - All scripts in the `CODE` folder are executable. You must set the language to either `'FR'` or `'EN'` (or `'fr'`, `'en'`) at the beginning of each script.
@@ -27,7 +27,7 @@ Contains the main scripts to reproduce the results:
 - **Dispersion Analysis**: Full experimental setup for Section 4.2, covering all dimensionalities and 30 seed iterations.
 - **Ground Truth Analysis**: Code for Section 4.3, including analysis of style and dispersion deltas and MSE additional experiment per class.
 
-### `PLOT`
+### `PLOTS`
 Contains all major plots for each section:
 - **Section 4.1**: 2D PCA clustering projections, along with class frequency bar plots.
 - **Section 4.2**: Contour plots for dispersion results (using sentence-transformers/all-MiniLM-L12-v2) in 2D UMAP, including sensitivity plots across different iterations for decision making.
