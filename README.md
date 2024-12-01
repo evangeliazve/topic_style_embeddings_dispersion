@@ -1,6 +1,7 @@
 # Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models
 
 This repository contains the code, data, plots, and results accompanying our paper submission to [COLING 2025](https://coling2025.org).
+For any additional information, please contact : evangelia.zve@lip6.fr
 
 ## Setup
 - All scripts in the `CODE` folder are executable. You must set the language to either `'FR'` or `'EN'` (or `'fr'`, `'en'`) at the beginning of each script.
