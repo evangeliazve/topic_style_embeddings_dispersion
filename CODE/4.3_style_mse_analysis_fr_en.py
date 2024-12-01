@@ -17,7 +17,7 @@ from sklearn.metrics import mean_squared_error
 from scipy.stats import mannwhitneyu, shapiro, levene
 
 # Paths for datasets and results
-your_path = "/Users/evangeliazve/Documents"
+your_path = ""
 base_paths = {
     "FR": f'{your_path}/Style-Embeddings-paper-zip/DATA/Four Classes Embeddings - FRENCH/',
     "EN": f'{your_path}/Style-Embeddings-paper-zip/DATA/Four Classes Embeddings - ENGLISH/'
