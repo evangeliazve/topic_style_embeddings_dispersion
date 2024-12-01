@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # Base paths for the datasets in French and English
-your_path = "/Users/evangeliazve/Documents/"
+your_path = ""
 
 base_paths = {
     "FR": f"{your_path}/Style-Embeddings-paper-zip/DATA/Four Classes Embeddings - FRENCH/",
