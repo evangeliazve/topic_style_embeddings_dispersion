@@ -9,7 +9,7 @@ from scipy.stats import ttest_ind
 from scipy.stats import chi2
 import umap
 
-your_path = "/Users/evangeliazve/Documents"
+your_path = ""
 # Paths for French and English datasets
 base_paths = {
     "FR": f'{your_path}/Style-Embeddings-paper-zip/DATA/Four Classes Embeddings - FRENCH/',
