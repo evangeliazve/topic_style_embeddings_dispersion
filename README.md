@@ -1,4 +1,4 @@
-# Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Language Models
+# Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Different Language Models
 
 This repository contains the code, data, plots, and results accompanying our paper submission to [COLING 2025](https://coling2025.org).
 
