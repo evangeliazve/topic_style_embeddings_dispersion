@@ -9,7 +9,7 @@ from scipy.stats import pearsonr
 
 # User input with desired language
 language = input("Please enter the desired language (e.g., 'en' for English, 'fr' for French): ")
-your_path = "/Users/evangeliazve/Documents" # to change with your path
+your_path = "" # to change with your path
 
 # Load the Stylometry report for 8 categories
 stylo_df_file_path = f'{your_path}/Style-Embeddings-paper-zip/DATA/stylo_df_grouped_{language.lower()}.xlsx'
