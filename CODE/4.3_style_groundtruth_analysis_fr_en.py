@@ -12,7 +12,7 @@ from scipy.stats import ttest_ind
 
 # User input with desired language
 language = input("Please enter the desired language (e.g., 'en' for English, 'fr' for French): ").lower()
-your_path = "/Users/evangeliazve/Documents" # to change with your path
+your_path = "" # to change with your path
 
 # Set the directory paths manually
 input_directory = f'{your_path}/Style-Embeddings-paper-zip/DATA/'  # Replace with your actual input directory
