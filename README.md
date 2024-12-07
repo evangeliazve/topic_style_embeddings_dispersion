@@ -22,10 +22,11 @@ Contains the output data from the analysis:
 
 ### `CODE`
 Contains the main scripts to reproduce the results:
-- **Text Generation**: Code for generating additional classes using GPT-4.
 - **Clustering Analysis**: Code for Section 4.1.
 - **Dispersion Analysis**: Full experimental setup for Section 4.2, covering all dimensionalities and 30 seed iterations.
 - **Style Ground Truth Analysis**: Code for Section 4.3, including analysis of style and dispersion deltas and MSE additional experiment per class.
+- **Text Generation**: Code for generating additional classes using GPT-4.
+
 
 ### `PLOTS`
 Contains all major plots for each section:
