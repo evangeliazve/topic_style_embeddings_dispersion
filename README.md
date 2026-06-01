@@ -35,3 +35,23 @@ Contains all major plots for each section:
 - **Section 4.3**: Correlation plots comparing dispersion deltas with stylometric ground truth deltas, and analysis of dispersion results across four classes.
 
 **For any support or additional information, please contact : evangelia.zve@lip6.fr**
+
+## Citation
+
+If you use this repository in your work, please cite the related paper:
+
+### APA
+
+Icard, B., Zve, E., Sainero, L., Breton, A., & Ganascia, J.-G. (2025). Embedding style beyond topics: Analyzing dispersion effects across different language models. In Proceedings of the 31st International Conference on Computational Linguistics (pp. 3511–3522).
+
+### BibTeX
+
+⁠ bibtex
+@inproceedings{icard2025embedding,
+  title     = {Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Different Language Models},
+  author    = {Icard, Benjamin and Zve, Evangelia and Sainero, Lila and Breton, Alice and Ganascia, Jean-Gabriel},
+  booktitle = {Proceedings of the 31st International Conference on Computational Linguistics},
+  pages     = {3511--3522},
+  year      = {2025}
+}
+
