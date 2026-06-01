@@ -46,10 +46,12 @@ Icard, B., Zve, E., Sainero, L., Breton, A., & Ganascia, J.-G. (2025). Embedding
 
 ### BibTeX
 
-⁠@inproceedings{icard2025embedding,
+```bibtex
+@inproceedings{icard2025embedding,
   title     = {Embedding Style Beyond Topics: Analyzing Dispersion Effects Across Different Language Models},
   author    = {Icard, Benjamin and Zve, Evangelia and Sainero, Lila and Breton, Alice and Ganascia, Jean-Gabriel},
   booktitle = {Proceedings of the 31st International Conference on Computational Linguistics},
   pages     = {3511--3522},
   year      = {2025}
 }
+```
